@@ -1,6 +1,6 @@
 ---
 name: fui-module-development
-description: Develop and publish web modules using FUI Framework. Use this skill when (1) creating new FUI modules with controls.json, (2) editing existing FUI module UI or logic, (3) publishing modules to FUI server, (4) working with FUI components like f-table or f-dialog, or (5) debugging FUI action errors.
+description: Use this skill when developing, structuring, or modifying FUI web modules. It provides strict guidelines for the metadata-driven architecture (controls.json), mandatory grid layout system, action protocols, and includes specific tools for saving and publishing modules/components.
 ---
 
 # FUI Module Development
@@ -11,21 +11,23 @@ Develop web modules using FUI's metadata-driven approach where UI and logic are 
 
 ```
 <module-name>/
-├── controls.json      (Core: data, watch, controls, set)
+├── module.json        (Core: data, watch, controls, set - Replaces controls.json)
 ├── script.js          (Helper functions)
-├── module.config.json (Framework version)
+├── _info.json         (Module Metadata: ID, Name, Framework version)
+├── dependencies.json  (External libraries & assets)
+├── header.html        (Optional: Header template)
+├── body.html          (Optional: Body template)
 ├── components/        (Custom .vue components)
 └── styles/            (CSS)
 ```
 
-## controls.json Anatomy
+## module.json Anatomy
 
 The core file has four sections:
 -   **`data`**: Reactive state and named Actions
 -   **`watch`**: Observers triggering actions on change
 -   **`controls`**: UI layout (containers > rows > cols > elements)
 -   **`set`**: Module settings (title, menu)
-
 ## Action Protocol
 
 Define logic in `data` as named action objects. Execute with `CALL`.
@@ -128,10 +130,13 @@ Copy templates from `examples/` as starting points. See [ui-templates.md](refere
 
 ## Instructions
 
-1.  **Creating New Modules**: ALWAYS create a ROOT DIRECTORY with the module name first (e.g., `my-module/`). ALl files (`controls.json`, `script.js`, etc.) MUST be inside this directory.
-    -   `controls.json` (Required): Define UI and Logic.
-    -   `module.config.json` (Required): Framework config.
-    -   `styles/index.css` (Optional): Custom CSS (No `<style>` in .vue).
+## Instructions
+
+1.  **Creating New Modules**: ALWAYS create a ROOT DIRECTORY with the module name first (e.g., `my-module/`). All files (`module.json`, `script.js`, etc.) MUST be inside this directory.
+    -   `module.json` (Required): Define UI and Logic.
+    -   `_info.json` (Required): Metadata (ID, Name, Framework).
+    -   `dependencies.json` (Optional): External libs.
+    -   `styles/index.css` (Optional): Custom CSS.
     -   `components/` (Optional): Custom Vue components.
 
 2.  **Reference Docs**: See `references/` for component and function details:
@@ -140,7 +145,58 @@ Copy templates from `examples/` as starting points. See [ui-templates.md](refere
     -   [coding-standards.md](references/coding-standards.md) - Class naming & Menu config
     -   [controls-patterns.md](references/controls-patterns.md) - Action patterns & Logic
     -   [ui-templates.md](references/ui-templates.md) - Template usage guide
+    -   [advanced-techniques.md](references/advanced-techniques.md) - Advanced Logic & PDF patterns
+    -   [quality-assurance.md](references/quality-assurance.md) - Code Review & Edge Case Analysis
 
-3.  **Editing controls.json**: Use valid JSON. Reference state with `vueData.` prefix.
+3.  **Module Assessment**: When asked to review/assess a module, follows the [Quality Assurance Protocol](references/quality-assurance.md) to identify issues, propose clean solutions, and analyze edge cases.
 
-4.  **UI Templates**: Copy from `examples/`, modify APIs and fields.
+4.  **Editing module.json**: Use valid JSON. Reference state with `vueData.` prefix.
+
+5.  **UI Templates**: Copy from `examples/`, modify APIs and fields.
+
+## Continuous Improvement
+
+This skill is a living document. The Agent MUST actively maintain and improve it based on user feedback and project evolution.
+
+### Workflow
+1.  **Post-Task Review**: After completing a complex task, ask the user: *"Are there any lessons, patterns, or corrections from this task that should be added to the FUI skill?"*
+2.  **Correction & Refinement**: If the user points out a mistake or a better way to do something:
+    -   **Update**: Modify existing guidelines/references immediately.
+    -   **Delete**: Remove obsolete or incorrect information.
+    -   **Add**: Create new reference files for novel techniques.
+3.  **Knowledge Consolidation**: Periodically review `references/` to merge scattered tips into cohesive guides.
+
+**Goal**: Ensure `fui-skill` always reflects the most up-to-date, best-practice way to build FUI modules.
+
+## Common Components
+
+### f-table (Data Table with CRUD)
+
+The `f-table` component supports built-in CRUD operations using `update-api` and `update-form`.
+
+**Configuration:**
+- **`ctrl-update`**: Add a header with `value: "ctrl-update"` to show Action buttons.
+- **`update-form`**: Array of controls for the Add/Edit dialog.
+- **`update-api`**: Object defining logic for `new`, `edit`, `delete` keys. Logic passed as string expressions.
+
+**Example:**
+```json
+{
+  "el": "f-table",
+  "attr": {
+    ":items": "vueData.list",
+    ":headers": [
+      { "text": "Name", "value": "name" },
+      { "text": "Actions", "value": "ctrl-update" }
+    ],
+    ":update-form": [
+      { "el": "v-text-field", "attr": { "v-model": "name", "label": "Name" } }
+    ],
+    ":update-api": {
+      "new": { "list": "[...list, item]" },
+      "edit": { "list": "list.map(i => i.id === item.id ? item : i)" },
+      "delete": { "list": "list.filter(i => i.id !== item.id)" }
+    }
+  }
+}
+```
