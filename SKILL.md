@@ -1,9 +1,9 @@
 ---
-name: fui-module-development
+name: fui-skill
 description: Use this skill when developing, structuring, or modifying FUI web modules. It provides strict guidelines for the metadata-driven architecture (controls.json), mandatory grid layout system, action protocols, and includes specific tools for saving and publishing modules/components.
 ---
 
-# FUI Module Development
+# FUI Skill
 
 Develop web modules using FUI's metadata-driven approach where UI and logic are defined in JSON.
 
