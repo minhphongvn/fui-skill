@@ -8,9 +8,10 @@
 -   **Props**: Use camelCase in script, kebab-case in templates (e.g., `userProfile` -> `:user-profile`).
 
 ### CSS Classes
--   **No `<style>` Tags**: Do not use `<style>` in `.vue` files. All custom styles must go in `styles/index.css`.
+-   **No `<style>` Tags in `.vue`**: Do not use `<style>` or `<style scoped>` in `.vue` component files.
+-   **Style Placement**: All custom styles must go in `styles/index.css` OR `header.html` (using `<style>` tag). Both are valid targets.
 -   **Vuetify Utilities**: Prioritize Vuetify helper classes (e.g., `ma-2`, `pa-0`, `d-flex`, `primary--text`).
--   **Custom Classes**: Use meaningful names, avoid generic names like `.box` or `.red`.
+-   **Custom Classes**: Use meaningful prefixed names (e.g., `ep-hero`, `ep-field-grid`). Avoid generic names like `.box` or `.red`.
 -   **State Classes**: Use descriptive names for state (e.g., `.is-active`, `.has-error`).
 
 ### Action Keys (`controls.json`)
@@ -60,3 +61,51 @@ Define the application menu in the `set` object of `controls.json`.
 -   **Data Binding**: Avoid complex logic in JSON attributes. Use computed properties in components or simpler `vueData` structures.
 -   **Event Handling**: Use `CALL(vueData.actionName)` for all complex interactions. Avoid inline JS like `vueData.count++` for anything beyond simple toggles.
 -   **Mobile Responsiveness**: Always configure `configForm.xs` and `configForm.md` for responsive form widths.
+
+## 5. Component Registration (`_components.json`)
+
+Components are registered using an **upsert pattern**:
+
+-   **New component** (before publish): Only `comName` is required. Do NOT manually assign `comID`.
+    ```json
+    [
+      { "comName": "hr-employee-profile" }
+    ]
+    ```
+-   **After publish & sync**: The server auto-assigns `comID`. The file gets updated on sync:
+    ```json
+    [
+      { "comID": 7813, "comName": "hr-employee-profile" }
+    ]
+    ```
+
+> **Rule**: Never manually create or modify `comID`. It is server-generated.
+
+## 6. Vue Template Syntax Constraints
+
+Inside `<template>` of `.vue` files:
+
+-   **No template strings (backticks)**: Use string concatenation instead.
+    ```html
+    <!-- ❌ WRONG -->
+    :label="`Total (${items.length})`"
+    <!-- ✅ CORRECT -->
+    :label="'Total (' + items.length + ')'"
+    ```
+-   **No arrow functions**: Use `function()` syntax for broader compatibility.
+    ```js
+    // ❌ WRONG
+    props: { items: { default: () => [] } }
+    // ✅ CORRECT
+    props: { items: { default: function() { return [] } } }
+    ```
+
+## 7. Complex Module Architecture
+
+When a module's `module.json` controls exceed ~200 lines:
+
+-   **Extract to Vue component**: Move the UI into a `.vue` component. Keep `module.json` lean (data/API only + a single component call in `controls`).
+-   **Props binding**: Pass all data from `module.json` via props. Use kebab-case for prop names in templates (`:nhan-vien="nhanVien"`).
+-   **Sticky headers**: When combining multiple sticky elements (e.g., hero + tabs), wrap them in **one parent div** with `position: sticky` instead of making each element sticky individually.
+-   **Tab navigation vs Accordion**: For 5+ sections of data, prefer horizontal `v-tabs` over `v-expansion-panels`. Tabs show one section at a time, reduce cognitive overload, and support swipe gestures on mobile.
+-   **Swipe gestures**: Attach `touchstart`/`touchend` listeners on the **outermost wrapper** (not on content area) so swipe works regardless of content height.

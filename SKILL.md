@@ -108,15 +108,6 @@ Inside the `cols` array (or nested `innerHTML`), every item is a **Control Objec
 -   **Attributes**: Use `attr` for element attributes. Use `col` for grid column attributes.
 -   **Events**: Use `v-on:click` (valid JSON), not `@click`.
 
-
-## MCP Tools
-
-Use these tools to interact with FUI:
-
--   **`save_module`**: Download module from server → `projectId`, `moduleId`, `outputDir`
--   **`publish_module`**: Upload module to server → `projectId`, `moduleId`, `moduleDir`
--   **`publish_component`**: Upload a `.vue` component → `projectId`, `moduleId`, `componentName`, `componentPath`
-
 ## UI Templates
 
 Copy templates from `examples/` as starting points. See [ui-templates.md](references/ui-templates.md) for usage guide.
@@ -127,8 +118,6 @@ Copy templates from `examples/` as starting points. See [ui-templates.md](refere
 | [table-crud.json](examples/table-crud.json) | JSON | Data tables with CRUD |
 | [dialog-form.json](examples/dialog-form.json) | JSON | Modal dialogs |
 | [component.vue](examples/component.vue) | Vue | Custom component starter |
-
-## Instructions
 
 ## Instructions
 
